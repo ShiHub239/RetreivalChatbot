@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from langchain.agents import tool
 
 
 keyword = "toronto"
@@ -15,8 +16,16 @@ api_version = "v3"
 def construct_url(id):
     return f"https://www.youtube.com/watch?v={id}"
 
+@tool
+def youtube_search(keyword: str, limit: int) -> list[dict]:
+    """ Search for a certain amount of videos on YouTube given by the limit, 
+        and return the titles and URLs for each of them
 
-def youtube_search(keyword, limit):
+        Args:
+            keyword: Term we want to search for
+            limit: Maximume amount of videos to search for
+    """
+
     youtube = build(api_service_name, api_version, developerKey=DEV_KEY)
 
     response = youtube.search().list(
