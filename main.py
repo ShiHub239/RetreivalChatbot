@@ -19,6 +19,18 @@ placeholder = MessagesPlaceholder(variable_name="chat_history", optional=True)
 human_template = HumanMessagePromptTemplate.from_template("{input}")
 scratchpad = MessagesPlaceholder(variable_name="agent_scratchpad")
 
+
+def create_agent(agent_executor):
+    message_history = ChatMessageHistory()
+    agent_with_history = RunnableWithMessageHistory(
+        agent_executor,
+        lambda session_id: message_history,
+        input_messages_key="input",
+        history_messages_key="chat_history"
+    )
+    return agent_with_history
+
+
 agent_prompt = ChatPromptTemplate.from_messages(
     [
         system_template,
@@ -42,24 +54,20 @@ agent_executor = AgentExecutor(
     verbose=True
 )
 
-message_history = ChatMessageHistory()
-agent_with_history = RunnableWithMessageHistory(
-    agent_executor,
-    lambda session_id: message_history,
-    input_messages_key="input",
-    history_messages_key="chat_history"
-)
+agent_with_history = create_agent(agent_executor)
 
 while (True):
     user_input = input("Please enter some text: \n")
     user_input = user_input.lower().strip()
     if user_input == "exit":
         break
-
-    response = agent_with_history.invoke(
-        {"input": user_input}, 
-        config={"configurable": {"session_id": "<foo>"}}
-    )
+    if user_input == "clear":
+        agent_with_history = create_agent(agent_executor)
+    else:
+        response = agent_with_history.invoke(
+            {"input": user_input}, 
+            config={"configurable": {"session_id": "<foo>"}}
+        )
 
 
 

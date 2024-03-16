@@ -17,13 +17,14 @@ def construct_url(id):
     return f"https://www.youtube.com/watch?v={id}"
 
 @tool
-def youtube_search(keyword: str, limit: int) -> list[dict]:
-    """ Search for a certain amount of videos on YouTube given by the limit, 
-        and return the titles and URLs for each of them
+def youtube_search(keyword: str, limit: int = 10) -> list[dict]:
+    """ Search on YouTube for videos, and return the titles and URLs for each of them. 
+        Find as many videos as possible.
+
 
         Args:
             keyword: Term we want to search for
-            limit: Maximume amount of videos to search for
+            limit: Maximum amount of videos to search for
     """
 
     youtube = build(api_service_name, api_version, developerKey=DEV_KEY)
@@ -46,27 +47,3 @@ def youtube_search(keyword: str, limit: int) -> list[dict]:
 
     return video_list
     
-
-    # channels = []
-    # playlists = []
-
-    # # Add each result to the appropriate list, and then display the lists of
-    # # matching videos, channels, and playlists.
-    # for search_result in response.get('items', []):
-    #     if search_result['id']['kind'] == 'youtube#video':
-    #         videos.append('%s (%s)' % (search_result['snippet']['title'],
-    #                                 search_result['id']['videoId']))
-    #     elif search_result['id']['kind'] == 'youtube#channel':
-    #         channels.append('%s (%s)' % (search_result['snippet']['title'],
-    #                                 search_result['id']['channelId']))
-    #     elif search_result['id']['kind'] == 'youtube#playlist':
-    #         playlists.append('%s (%s)' % (search_result['snippet']['title'],
-    #                                     search_result['id']['playlistId']))
-
-    # print('Videos:\n', '\n'.join(videos), '\n')
-    # print('Channels:\n', '\n'.join(channels), '\n')
-    # print('Playlists:\n', '\n'.join(playlists), '\n')
-
-
-
-# print(youtube_search("toronto", 25)[0])
