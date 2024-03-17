@@ -1,4 +1,3 @@
-
 import os
 from langchain_openai import OpenAIEmbeddings
 from youtube import youtube_search
@@ -10,7 +9,6 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
-
 from langchain.tools.retriever import create_retriever_tool
 
 load_dotenv()
