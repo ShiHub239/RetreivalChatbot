@@ -1,4 +1,6 @@
 
+import os
+from langchain_openai import OpenAIEmbeddings
 from youtube import youtube_search
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -6,8 +8,16 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_pinecone import PineconeVectorStore
+from pinecone import Pinecone
+
+from langchain.tools.retriever import create_retriever_tool
 
 load_dotenv()
+
+pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+index = pc.Index("pdfs")
+embeddings_model = OpenAIEmbeddings()
 
 llm = ChatOpenAI(
     model="gpt-3.5-turbo",
@@ -19,6 +29,17 @@ placeholder = MessagesPlaceholder(variable_name="chat_history", optional=True)
 human_template = HumanMessagePromptTemplate.from_template("{input}")
 scratchpad = MessagesPlaceholder(variable_name="agent_scratchpad")
 
+vectorstore = PineconeVectorStore(
+    index=index, 
+    embedding=embeddings_model, 
+    namespace="test150" 
+)
+
+retrieval_tool = create_retriever_tool(
+    retriever=vectorstore.as_retriever(),
+    name="Search_PDF",
+    description="Retrieve information from the knowledge base, and display your results"
+)
 
 def create_agent(agent_executor):
     message_history = ChatMessageHistory()
@@ -40,7 +61,7 @@ agent_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-tool_list = [youtube_search]
+tool_list = [youtube_search, retrieval_tool]
 
 agent = create_openai_tools_agent(
     llm=llm,
