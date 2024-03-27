@@ -1,6 +1,7 @@
 import os
 from langchain_openai import OpenAIEmbeddings
 from youtube import youtube_search
+from image import generate_image
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
@@ -59,7 +60,7 @@ agent_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-tool_list = [youtube_search, retrieval_tool]
+tool_list = [youtube_search, retrieval_tool, generate_image]
 
 agent = create_openai_tools_agent(
     llm=llm,
